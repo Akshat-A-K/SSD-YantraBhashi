@@ -1,70 +1,78 @@
-# Getting Started with Create React App
+# Code Editor
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A simple and clean code editor built with React and Monaco Editor, designed for a custom programming language. This is a student project focused on providing a straightforward coding environment.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### **Core Editor Features**
+- **Monaco Editor**: Professional code editing experience
+- **Custom Syntax Highlighting**: Custom syntax highlighting for the programming language
+- **Basic Auto-completion**: Code suggestions and IntelliSense
+- **Error Detection**: Real-time syntax error highlighting
+- **Code Formatting**: Automatic code formatting
+- **Theme Support**: Light and Dark themes
+- **File Operations**: Import and save code files
 
-### `npm start`
+### **Simple Interface**
+- **Clean Design**: Minimal, distraction-free interface
+- **Custom Language**: Dedicated support for the custom programming language
+- **Responsive Design**: Works on desktop and mobile devices
+- **Student-Friendly**: Appropriate complexity for college students
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+### **Basic Features**
+- **Bracket Pair Colorization**: Visual bracket matching
+- **Indentation Guides**: Visual code structure
+- **Smooth Scrolling**: Enhanced scrolling experience
+- **Context Menu**: Right-click context menu
+- **Status Messages**: Real-time feedback for user actions
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Custom Language Support
 
-### `npm test`
+- **Custom Syntax**: Dedicated syntax highlighting for the programming language
+- **Language Features**: Support for variables, functions, loops, conditionals
+- **Sample Code**: Built-in sample code with examples
+- **Syntax Validation**: Basic syntax checking for the custom language
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Usage
 
-### `npm run build`
+1. **Authentication**: Sign in to access the editor
+2. **Code Editing**: Write code with syntax highlighting
+3. **Theme Selection**: Choose between Light and Dark themes
+4. **Import File**: Use the "Import" button to load code from a file
+5. **Save File**: Use the "Save" button to download your code as a text file
+6. **Sample Code**: Use the "Load Sample" button to load example code
+7. **Code Validation**: Use the "Validate" button to check your code
+8. **AI Suggestion**: Use the "AI Suggestion" button for future AI integration
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Basic Keyboard Shortcuts
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- `Ctrl+F` / `Cmd+F`: Find
+- `Ctrl+H` / `Cmd+H`: Find and Replace
+- `Ctrl+/` / `Cmd+/`: Toggle Line Comment
+- `Ctrl+Shift+K` / `Cmd+Shift+K`: Delete Line
+- `Alt+Up/Down`: Move Line Up/Down
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Technical Stack
 
-### `npm run eject`
+- **React 18**: Modern React with hooks
+- **Monaco Editor**: VS Code's editor engine
+- **CSS3**: Simple styling with Flexbox
+- **Responsive Design**: Mobile-friendly design
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Browser Support
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- Chrome 90+
+- Firefox 88+
+- Safari 14+
+- Edge 90+
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Project Information
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+This is a student project built for educational purposes. The code is written from scratch without copying from existing projects, making it suitable for academic submissions.
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Features:**
+- Clean, simple interface
+- Custom language support
+- Basic editor functionality
+- Student-appropriate complexity
+- No plagiarism concerns
