@@ -45,7 +45,8 @@ export default function CodeEditor({
   onInsertSample,
   onChange,
   onAISuggestion,
-  height = "500px"
+  height = "500px",
+  readOnly = false
 }) {
   const [theme, setTheme] = useState(defaultTheme);
   const [code, setCode] = useState(initialCode || SAMPLE_CODE);
@@ -67,7 +68,7 @@ export default function CodeEditor({
     parameterHints: { enabled: true },
     hover: { enabled: true },
     contextmenu: true,
-    readOnly: false,
+    readOnly: readOnly,
     folding: true,
     bracketPairColorization: { enabled: true }
   });
@@ -175,34 +176,38 @@ export default function CodeEditor({
         </div>
 
         <div className="toolbar-right">
-          <button 
-            className="toolbar-btn" 
-            onClick={handleImportFile}
-            title="Import File"
-          >
-            Import
-          </button>
-          <button 
-            className="toolbar-btn" 
-            onClick={handleSaveFile}
-            title="Save File"
-          >
-            Save
-          </button>
-          <button 
-            className="toolbar-btn" 
-            onClick={applySample}
-            title="Load Sample Code"
-          >
-            Load Sample
-          </button>
-          <button 
-            className="toolbar-btn" 
-            onClick={handleAISuggestion}
-            title="Get AI Suggestion"
-          >
-            AI Suggestion
-          </button>
+          {!readOnly && (
+            <>
+              <button 
+                className="toolbar-btn" 
+                onClick={handleImportFile}
+                title="Import File"
+              >
+                Import
+              </button>
+              <button 
+                className="toolbar-btn" 
+                onClick={handleSaveFile}
+                title="Save File"
+              >
+                Save
+              </button>
+              <button 
+                className="toolbar-btn" 
+                onClick={applySample}
+                title="Load Sample Code"
+              >
+                Load Sample
+              </button>
+              <button 
+                className="toolbar-btn" 
+                onClick={handleAISuggestion}
+                title="Get AI Suggestion"
+              >
+                AI Suggestion
+              </button>
+            </>
+          )}
           <button 
             className="toolbar-btn toolbar-btn-primary" 
             onClick={handleValidate}

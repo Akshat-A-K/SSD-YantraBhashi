@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from "react";
 import AuthCard from "./components/AuthCard";
 import CodeEditor from "./components/CodeEditor";
+import InstructorDashboard from "./components/InstructorDashboard";
 import "./style.css";
 
 export default function App() {
@@ -50,7 +51,7 @@ export default function App() {
         </div>
         {user && (
           <div className="user-row">
-            <span className="user-email">{user.email}</span>
+            <span className="user-email">{user.username} ({user.role})</span>
             <button className="btn btn-ghost" onClick={handleSignOut}>
               Sign out
             </button>
@@ -61,6 +62,8 @@ export default function App() {
       <main className="app-main">
         {!user ? (
           <AuthCard onAuth={handleAuth} />
+        ) : user.role === "instructor" ? (
+          <InstructorDashboard user={user} onSignOut={handleSignOut} />
         ) : (
           <div className="editor-panel">
             <CodeEditor

@@ -657,3 +657,250 @@ body {
   white-space: nowrap;
   border: 0;
 }
+
+/* Instructor Dashboard Styles */
+.instructor-dashboard {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.header-info h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.header-info p {
+  margin: 0.25rem 0 0 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.dashboard-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.students-panel,
+.submissions-panel,
+.code-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  border-right: 1px solid var(--border-color);
+}
+
+.students-panel {
+  width: 300px;
+  min-width: 250px;
+}
+
+.submissions-panel {
+  width: 350px;
+  min-width: 300px;
+}
+
+.code-panel {
+  flex: 1;
+  border-right: none;
+}
+
+.panel-header {
+  padding: 1rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.panel-header h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+}
+
+.search-box {
+  margin-top: 0.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+}
+
+.students-list,
+.submissions-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+}
+
+.student-item,
+.submission-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.student-item:hover,
+.submission-item:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+.student-item.selected,
+.submission-item.selected {
+  background: var(--accent-color);
+  border-color: var(--accent-color);
+  color: white;
+}
+
+.student-info,
+.submission-info {
+  margin-bottom: 0.25rem;
+}
+
+.student-name,
+.submission-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.student-item.selected .student-name,
+.submission-item.selected .submission-title {
+  color: white;
+}
+
+.student-email,
+.submission-date {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.student-item.selected .student-email,
+.submission-item.selected .submission-date {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.student-stats,
+.submission-status {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.submissions-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+}
+
+.student-item.selected .submissions-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.status-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge.submitted {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.submission-item.selected .status-badge.submitted {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.submission-meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.editor-container {
+  flex: 1;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.loading {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.no-submissions {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Responsive Design for Instructor Dashboard */
+@media (max-width: 1200px) {
+  .submissions-panel {
+    width: 300px;
+    min-width: 250px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-content {
+    flex-direction: column;
+  }
+
+  .students-panel,
+  .submissions-panel {
+    width: 100%;
+    min-width: auto;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .dashboard-header {
+    padding: 1rem;
+  }
+
+  .header-info h2 {
+    font-size: 1.2rem;
+  }
+}

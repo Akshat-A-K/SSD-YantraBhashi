@@ -2,19 +2,21 @@ import React from "react";
 
 export default function AuthCard({ onAuth }) {
   const [mode, setMode] = React.useState("signin"); // 'signin' | 'signup'
+  const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [role, setRole] = React.useState("student"); // 'student' | 'instructor'
   const [error, setError] = React.useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setError("");
-    if (!email || !password) {
-      setError("Please enter email and password.");
+    if (!username || !email || !password) {
+      setError("Please enter username, email and password.");
       return;
     }
-    // Pure frontend simulation
-    onAuth?.({ email });
+    // Pure frontend simulation - in real app, this would call your login API
+    onAuth?.({ username, email, role });
   };
 
   return (
@@ -25,6 +27,18 @@ export default function AuthCard({ onAuth }) {
       </div>
 
       <form className="card-body" onSubmit={handleSubmit}>
+        <label className="field">
+          <span>Username</span>
+          <input
+            type="text"
+            placeholder="Enter username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            autoComplete="username"
+            required
+          />
+        </label>
+
         <label className="field">
           <span>Email</span>
           <input
@@ -47,6 +61,18 @@ export default function AuthCard({ onAuth }) {
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
             required
           />
+        </label>
+
+        <label className="field">
+          <span>Role</span>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            required
+          >
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
         </label>
 
         {error ? <div className="error">{error}</div> : null}
