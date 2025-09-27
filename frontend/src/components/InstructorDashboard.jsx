@@ -133,7 +133,7 @@ CHATIMPU(sum);`,
     setSubmittingFeedback(true);
     try {
       await apiService.verifySubmission(selectedSubmission.id, feedbackText);
-      setStatus("✅ Feedback submitted successfully!");
+  setStatus("Feedback submitted successfully.");
       
       // Update the submission in the list
       setSubmissions(prev => prev.map(sub => 
@@ -145,7 +145,7 @@ CHATIMPU(sum);`,
       setShowFeedbackModal(false);
       setFeedbackText("");
     } catch (error) {
-      setStatus("❌ Error submitting feedback: " + error.message);
+      setStatus("Error submitting feedback: " + error.message);
     } finally {
       setSubmittingFeedback(false);
     }
@@ -173,8 +173,42 @@ CHATIMPU(sum);`,
   };
 
   const handleAISuggestion = (code) => {
-    setStatus("AI suggestion feature not available in instructor mode");
-    setTimeout(() => setStatus(""), 1500);
+    // Call backend AI suggestion endpoint and show result
+    (async () => {
+      setStatus("Requesting AI suggestion...");
+      try {
+  // Provide submission id and any known errors for context
+  const res = await apiService.aiSuggest(code, { submissionId: selectedSubmission?.id, errors: selectedSubmission?.errors || [] });
+        if (res && (res.correctedCode || res.corrected)) {
+          setStatus("AI suggestion received");
+          // Normalize to `correctedCode` for UI consumption
+          const normalized = { correctedCode: res.correctedCode || res.corrected, notes: res.notes || res.notes };
+          setSelectedSubmission(prev => prev ? { ...prev, aiSuggestion: normalized } : prev);
+        } else {
+          setStatus('No suggestions returned by AI');
+        }
+      } catch (err) {
+        setStatus('Error from AI service: ' + err.message);
+      }
+      setTimeout(() => setStatus(''), 3000);
+    })();
+  };
+
+  const handleApplyAISuggestion = (apply) => {
+    if (!selectedSubmission || !selectedSubmission.aiSuggestion) return;
+    if (apply) {
+      const corrected = selectedSubmission.aiSuggestion.corrected || selectedSubmission.aiSuggestion.corrections?.[0]?.text;
+      if (corrected) {
+        setSelectedSubmission(prev => ({ ...prev, code: corrected }));
+        setStatus('Applied AI suggestion to the editor');
+        setTimeout(() => setStatus(''), 2000);
+      }
+    } else {
+      setStatus('AI suggestion dismissed');
+      setTimeout(() => setStatus(''), 1500);
+    }
+    // Remove stored aiSuggestion after action
+    setSelectedSubmission(prev => prev ? { ...prev, aiSuggestion: undefined } : prev);
   };
 
   const formatDate = (dateString) => {
@@ -292,7 +326,7 @@ CHATIMPU(sum);`,
                   onClick={handleProvideFeedback}
                   title="Provide feedback to student"
                 >
-                  💬 Provide Feedback
+                  Provide Feedback
                 </button>
               </div>
             </div>
@@ -305,10 +339,23 @@ CHATIMPU(sum);`,
                 onInsertSample={handleInsertSample}
                 onChange={handleCodeChange}
                 onAISuggestion={handleAISuggestion}
+                onApplyCorrection={(apply) => handleApplyAISuggestion(apply)}
                 height="500px"
                 readOnly={true}
               />
               {status && <div className="status">{status}</div>}
+              {selectedSubmission.aiSuggestion && (
+                <div className="ai-suggestion-panel">
+                  <h4>AI Suggestion</h4>
+                  <div className="ai-suggestion-content">
+                    <pre>{selectedSubmission.aiSuggestion.corrected || JSON.stringify(selectedSubmission.aiSuggestion, null, 2)}</pre>
+                  </div>
+                  <div className="ai-suggestion-actions">
+                    <button className="btn" onClick={() => handleApplyAISuggestion(true)}>Apply</button>
+                    <button className="btn btn-ghost" onClick={() => handleApplyAISuggestion(false)}>Dismiss</button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -318,13 +365,14 @@ CHATIMPU(sum);`,
       {showFeedbackModal && (
         <div className="modal-overlay">
           <div className="feedback-modal">
-            <div className="modal-header">
+              <div className="modal-header">
               <h3>Provide Feedback</h3>
               <button 
                 className="close-btn"
                 onClick={handleCloseFeedbackModal}
+                aria-label="Close feedback modal"
               >
-                ✕
+                Close
               </button>
             </div>
             <div className="modal-body">

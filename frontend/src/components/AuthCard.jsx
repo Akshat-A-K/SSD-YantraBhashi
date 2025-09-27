@@ -24,12 +24,11 @@ export default function AuthCard({ onAuth }) {
           return;
         }
         
-        await apiService.signup({ username, email, password, role });
-        setError("");
-        setMode("signin");
-        setStatus("🎉 Account created successfully! Please sign in.");
-        // Clear success message after 5 seconds
-        setTimeout(() => setStatus(""), 5000);
+  await apiService.signup({ username, email, password, role });
+  setError("");
+  setMode("signin");
+  setStatus("Account created successfully. Please sign in.");
+  setTimeout(() => setStatus(""), 5000);
       } else {
         if ((!username && !email) || !password) {
           setError("Please enter username/email and password.");
