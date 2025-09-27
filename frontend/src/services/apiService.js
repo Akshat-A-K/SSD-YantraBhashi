@@ -5,7 +5,7 @@ class ApiService {
     this.baseURL = API_BASE_URL;
   }
 
-  // Helper method to make HTTP requests
+  
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const config = {
@@ -13,7 +13,7 @@ class ApiService {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      credentials: 'include', // Include cookies for authentication
+  credentials: 'include',
       ...options,
     };
 
@@ -32,7 +32,7 @@ class ApiService {
     }
   }
 
-  // User authentication methods
+  
   async signup(userData) {
     return this.request('/user/signup', {
       method: 'POST',
@@ -57,7 +57,7 @@ class ApiService {
     return this.request(`/user/${userId}`);
   }
 
-  // Code submission methods
+  
   async validateCode(code) {
     return this.request('/submission', {
       method: 'POST',
@@ -76,7 +76,7 @@ class ApiService {
     });
   }
 
-  // Instructor methods (these will need to be added to your backend)
+  
   async getAllStudents() {
     return this.request('/instructor/students');
   }
@@ -87,6 +87,22 @@ class ApiService {
 
   async getAllSubmissions() {
     return this.request('/instructor/submissions');
+  }
+
+  
+  async aiSuggest(code, extra = {}) {
+    
+    
+    const body = { code, ...extra };
+    
+    
+    const resp = await this.request('/ai/correct', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+
+    if (resp && resp.success && resp.data) return resp.data;
+    return resp;
   }
 }
 
