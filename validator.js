@@ -1,5 +1,4 @@
-export class SubmissionService {
-
+class YantraBhashaValidator {
     constructor() {
         this.variable_table = {};//store declared variables and their types
         this.error_list = [];//store all validation errors
@@ -215,3 +214,5 @@ export class SubmissionService {
         return true;
     }
 }
+
+module.exports = { YantraBhashaValidator };
