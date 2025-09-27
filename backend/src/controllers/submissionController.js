@@ -6,7 +6,12 @@ const submissionService = new SubmissionService();
 
 export async function validateCode(req, res) {
   try {
-    const { code } = req.body;
+    const { code } = req.body || {};
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: user not authenticated' });
+    }
+
     const userId = req.user.id;
 
     if (!code) {
@@ -37,7 +42,7 @@ export async function validateCode(req, res) {
     return res.status(201).json({ success: true, is_valid: (errors.length===0),errors:errors, submissionId: newSubmission.id });
   } catch (error) {
     console.error('Error validating code:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Server error '+error });
   }
 }
 
@@ -67,7 +72,7 @@ export async function getUserSubmissions(req, res) {
     return res.json({ items });
   } catch (error) {
     console.error('Error fetching submissions:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Server error '+error });
   }
 }
 
@@ -100,6 +105,6 @@ export async function verifySubmission(req, res) {
     return res.json({ success: true });
   } catch (error) {
     console.error('Error verifying submission:', error);
-    return res.status(500).json({ success: false, message: 'Server error' });
+    return res.status(500).json({ success: false, message: 'Server error '+error });
   }
 }
