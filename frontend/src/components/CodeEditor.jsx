@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import Editor from "@monaco-editor/react";
+import apiService from "../services/apiService";
 
 const THEMES = [
   { value: "vs", label: "Light" },
@@ -45,12 +46,15 @@ export default function CodeEditor({
   onInsertSample,
   onChange,
   onAISuggestion,
+  onApplyCorrection,
   height = "500px",
   instructorFeedback = null
 }) {
   const [theme, setTheme] = useState(defaultTheme);
   const [code, setCode] = useState(initialCode || SAMPLE_CODE);
   const [message, setMessage] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState(null);
   const [validationErrors, setValidationErrors] = useState([]);
   const [isValidating, setIsValidating] = useState(false);
   const [editorOptions] = useState({
@@ -159,18 +163,18 @@ export default function CodeEditor({
       
       if (result.success) {
         if (result.is_valid) {
-          setMessage("✅ Code is valid! No errors found.");
+          setMessage("Code is valid. No errors found.");
           setValidationErrors([]);
         } else {
-          setMessage(`❌ Code has ${result.errors.length} error(s).`);
+          setMessage(`Code has ${result.errors.length} error(s).`);
           setValidationErrors(result.errors || []);
         }
       } else {
-        setMessage("❌ Validation failed. Please try again.");
+        setMessage("Validation failed. Please try again.");
         setValidationErrors([]);
       }
     } catch (error) {
-      setMessage("❌ Validation error: " + error.message);
+  setMessage("Validation error: " + error.message);
       setValidationErrors([]);
       console.error("Validation error:", error);
     } finally {
@@ -180,11 +184,58 @@ export default function CodeEditor({
     setTimeout(() => setMessage(""), 5000);
   }, [code]);
 
-  const handleAISuggestion = useCallback(() => {
-    onAISuggestion?.(code);
-    setMessage("AI suggestion requested");
-    setTimeout(() => setMessage(""), 2000);
+  const handleAISuggestion = useCallback(async () => {
+    setAiLoading(true);
+  setMessage("AI suggestion requested");
+    try {
+      let result;
+      if (typeof onAISuggestion === 'function') {
+        // Call parent handler and use its result if provided
+        result = await Promise.resolve(onAISuggestion(code));
+        // If parent didn't return a result, fall back to direct backend call
+        if (result === undefined) {
+          result = await apiService.aiSuggest(code, { errors: validationErrors });
+        }
+      } else {
+        // No parent handler: call backend API directly and include current validation errors
+        result = await apiService.aiSuggest(code, { errors: validationErrors });
+      }
+
+      console.log('AI suggestion result:', result);
+      // If AI returned a corrected code, show a preview panel and let the user apply/dismiss
+      if (result && (result.correctedCode || result.corrected)) {
+        const normalized = { correctedCode: result.correctedCode || result.corrected, notes: result.notes || result.notes };
+        setAiSuggestion(normalized);
+      }
+    } catch (err) {
+      console.error('AI suggestion failed:', err);
+      setMessage('AI suggestion failed: ' + (err && err.message));
+    } finally {
+      setAiLoading(false);
+      setTimeout(() => setMessage(""), 3000);
+    }
   }, [code, onAISuggestion]);
+
+  const handleApplySuggestion = useCallback((apply) => {
+    if (!aiSuggestion) return;
+    if (apply) {
+      // If parent provided a handler for applying, call it, otherwise update code directly
+      if (typeof onApplyCorrection === 'function') {
+        try { onApplyCorrection(true); } catch (e) { /* ignore */ }
+      } else {
+        setCode(aiSuggestion.correctedCode);
+        onChange?.(aiSuggestion.correctedCode);
+      }
+      setMessage('AI suggestion applied');
+    } else {
+      if (typeof onApplyCorrection === 'function') {
+        try { onApplyCorrection(false); } catch (e) { /* ignore */ }
+      }
+      setMessage('AI suggestion dismissed');
+    }
+    setAiSuggestion(null);
+    setTimeout(() => setMessage(""), 2000);
+  }, [aiSuggestion, onApplyCorrection, onChange]);
 
   const handleSaveFile = useCallback(() => {
     const blob = new Blob([code], { type: 'text/plain' });
@@ -267,8 +318,9 @@ export default function CodeEditor({
             className="toolbar-btn" 
             onClick={handleAISuggestion}
             title="Get AI Suggestion"
+            disabled={aiLoading}
           >
-            AI Suggestion
+            {aiLoading ? 'AI...' : 'AI Suggestion'}
           </button>
           <button 
             className="toolbar-btn toolbar-btn-primary" 
@@ -312,6 +364,23 @@ export default function CodeEditor({
         </div>
       )}
 
+      {/* AI Suggestion Preview Panel */}
+      {aiSuggestion && (
+        <div className="ai-suggestion-panel">
+          <div className="ai-suggestion-header">
+            <h4>AI Suggestion Preview</h4>
+            <div className="ai-suggestion-notes">{aiSuggestion.notes}</div>
+          </div>
+          <div className="ai-suggestion-content">
+            <pre className="ai-suggestion-pre">{aiSuggestion.correctedCode}</pre>
+          </div>
+          <div className="ai-suggestion-actions">
+            <button className="btn" onClick={() => handleApplySuggestion(true)}>Apply</button>
+            <button className="btn btn-ghost" onClick={() => handleApplySuggestion(false)}>Dismiss</button>
+          </div>
+        </div>
+      )}
+
       {/* Loading State */}
       {isValidating && (
         <div className="validation-loading">
@@ -323,8 +392,8 @@ export default function CodeEditor({
       {/* Instructor Feedback */}
       {instructorFeedback && (
         <div className="instructor-feedback">
-          <div className="feedback-header">
-            <h4>📝 Instructor Feedback</h4>
+      <div className="feedback-header">
+        <h4>Instructor Feedback</h4>
           </div>
           <div className="feedback-content">
             <p>{instructorFeedback}</p>
