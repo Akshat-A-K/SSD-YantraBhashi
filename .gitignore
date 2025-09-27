@@ -23,6 +23,7 @@ build/
 # Environment
 .env
 .env.*.local
+backend/.env
 
 # Dependency directories
 package-lock.json
@@ -60,4 +61,4 @@ docker-compose.override.yml
 *.iml
 
 # Devcontainer
-.devcontainer/
+.devcontainer/backend/.env
