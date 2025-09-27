@@ -15,7 +15,7 @@ export default function App() {
   const handleAuth = useCallback((u) => {
     setUser(u);
     setStatus("");
-    // Save user to localStorage for persistence
+    
     localStorage.setItem('user', JSON.stringify(u));
   }, []);
 
@@ -27,13 +27,13 @@ export default function App() {
     } finally {
       setUser(null);
       setStatus("");
-      // Clear user from localStorage
+      
       localStorage.removeItem('user');
     }
   }, []);
 
   const handleValidate = useCallback(async (code) => {
-    setStatus("Validating code...");
+  setStatus("Validating code...");
     try {
       const response = await apiService.validateCode(code);
       if (response.success) {
@@ -56,13 +56,23 @@ export default function App() {
     setTimeout(() => setStatus(""), 1500);
   }, []);
 
-  const handleAISuggestion = useCallback((code) => {
-    setStatus("AI suggestion feature - backend integration pending");
-    console.log("[frontend] AI suggestion requested for code:", code.slice(0, 100));
-    setTimeout(() => setStatus(""), 3000);
+  const handleAISuggestion = useCallback(async (code) => {
+  setStatus("Requesting AI suggestion...");
+    try {
+      const res = await apiService.aiSuggest(code);
+      setStatus("AI suggestion ready");
+      
+      return res;
+    } catch (error) {
+      console.error('[frontend] AI suggestion error:', error);
+      setStatus('AI suggestion failed: ' + (error.message || 'unknown'));
+      throw error;
+    } finally {
+      setTimeout(() => setStatus(""), 3000);
+    }
   }, []);
 
-  // Restore user from localStorage on page load
+  
   useEffect(() => {
     const savedUser = localStorage.getItem('user');
     if (savedUser) {
