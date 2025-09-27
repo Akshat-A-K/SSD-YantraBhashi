@@ -159,11 +159,6 @@ export default function CodeEditor({
       <div className="editor-toolbar">
         <div className="toolbar-left">
           <div className="toolbar-group">
-            <label className="toolbar-label">Language:</label>
-            <span className="language-display">Custom</span>
-          </div>
-          
-          <div className="toolbar-group">
             <label className="toolbar-label">Theme:</label>
             <select 
               value={theme} 

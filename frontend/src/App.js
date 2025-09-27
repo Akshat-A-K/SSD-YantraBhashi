@@ -43,7 +43,10 @@ export default function App() {
     <div className="app">
       <header className="app-header">
         <div className="brand">
-          <h1>Code Editor</h1>
+          <h1 className="brand-title">
+            <span className="brand-yantra">Yantra</span>
+            <span className="brand-bhashi">Bhashi</span>
+          </h1>
         </div>
         {user && (
           <div className="user-row">
@@ -74,9 +77,6 @@ export default function App() {
         )}
       </main>
 
-      <footer className="app-footer">
-        <p>Code Editor - Student Project</p>
-      </footer>
     </div>
   );
 }

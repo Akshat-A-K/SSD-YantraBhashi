@@ -45,6 +45,40 @@ body {
   gap: 8px;
 }
 
+.brand-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transition: transform 0.3s ease;
+}
+
+.brand-title:hover {
+  transform: scale(1.05);
+}
+
+.brand-yantra {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+}
+
+.brand-bhashi {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 800;
+  letter-spacing: -1px;
+  text-shadow: 0 2px 4px rgba(240, 147, 251, 0.3);
+}
 .user-row {
   display: flex;
   align-items: center;
@@ -265,17 +299,7 @@ body {
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-.language-display {
-  padding: 6px 10px;
-  background: #f0f9ff;
-  border: 1px solid #bae6fd;
-  border-radius: 6px;
-  color: #0369a1;
-  font-size: 13px;
-  font-weight: 600;
-  min-width: 120px;
-  text-align: center;
-}
+/* Removed language-display styles - no longer needed */
 
 .toolbar-btn {
   display: flex;
