@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 
 const THEMES = [
@@ -45,11 +45,14 @@ export default function CodeEditor({
   onInsertSample,
   onChange,
   onAISuggestion,
-  height = "500px"
+  height = "500px",
+  instructorFeedback = null
 }) {
   const [theme, setTheme] = useState(defaultTheme);
   const [code, setCode] = useState(initialCode || SAMPLE_CODE);
   const [message, setMessage] = useState("");
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [isValidating, setIsValidating] = useState(false);
   const [editorOptions] = useState({
     minimap: { enabled: false },
     lineNumbers: "on",
@@ -95,6 +98,39 @@ export default function CodeEditor({
     });
   }, []);
 
+  // Add markers for validation errors
+  useEffect(() => {
+    if (editorRef.current) {
+      try {
+        if (validationErrors.length > 0) {
+          const model = editorRef.current.getModel();
+          if (model) {
+            const decorations = validationErrors.map(error => ({
+              range: {
+                startLineNumber: error.line_no,
+                startColumn: 1,
+                endLineNumber: error.line_no,
+                endColumn: model.getLineMaxColumn(error.line_no)
+              },
+              options: {
+                isWholeLine: true,
+                className: 'error-line-highlight',
+                glyphMarginClassName: 'error-glyph'
+              }
+            }));
+            
+            editorRef.current.deltaDecorations([], decorations);
+          }
+        } else {
+          // Clear markers when no errors
+          editorRef.current.deltaDecorations([], []);
+        }
+      } catch (error) {
+        console.error('Error with markers:', error);
+      }
+    }
+  }, [validationErrors]);
+
   const handleEditorChange = useCallback((value) => {
     setCode(value || "");
     onChange?.(value || "");
@@ -107,11 +143,45 @@ export default function CodeEditor({
     setTimeout(() => setMessage(""), 2000);
   }, [onInsertSample]);
 
-  const handleValidate = useCallback(() => {
-    onValidate?.(code);
+  const handleValidate = useCallback(async () => {
+    setIsValidating(true);
     setMessage("Validating code...");
-    setTimeout(() => setMessage(""), 2000);
-  }, [code, onValidate]);
+    setValidationErrors([]);
+    
+    try {
+      const response = await fetch('http://localhost:7979/submission', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ code })
+      });
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        if (result.is_valid) {
+          setMessage("✅ Code is valid! No errors found.");
+          setValidationErrors([]);
+        } else {
+          setMessage(`❌ Code has ${result.errors.length} error(s).`);
+          setValidationErrors(result.errors || []);
+        }
+      } else {
+        setMessage("❌ Validation failed. Please try again.");
+        setValidationErrors([]);
+      }
+    } catch (error) {
+      setMessage("❌ Validation error: " + error.message);
+      setValidationErrors([]);
+      console.error("Validation error:", error);
+    } finally {
+      setIsValidating(false);
+    }
+    
+    setTimeout(() => setMessage(""), 5000);
+  }, [code]);
 
   const handleAISuggestion = useCallback(() => {
     onAISuggestion?.(code);
@@ -225,6 +295,45 @@ export default function CodeEditor({
           loading={<div className="editor-loading">Loading editor...</div>}
         />
       </div>
+
+      {/* Error Display Section */}
+      {validationErrors.length > 0 && (
+        <div className="error-panel">
+          <div className="error-panel-header">
+            <h4>Validation Errors ({validationErrors.length})</h4>
+          </div>
+          <div className="error-list">
+            {validationErrors.map((error, index) => (
+              <div key={index} className="error-item">
+                <div className="error-line">
+                  <span className="error-line-number">Line {error.line_no}</span>
+                  <span className="error-message">{error.error}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isValidating && (
+        <div className="validation-loading">
+          <div className="loading-spinner"></div>
+          <span>Validating code...</span>
+        </div>
+      )}
+
+      {/* Instructor Feedback */}
+      {instructorFeedback && (
+        <div className="instructor-feedback">
+          <div className="feedback-header">
+            <h4>📝 Instructor Feedback</h4>
+          </div>
+          <div className="feedback-content">
+            <p>{instructorFeedback}</p>
+          </div>
+        </div>
+      )}
 
       {message && (
         <div className="editor-message">

@@ -79,7 +79,16 @@ export async function signin(req, res) {
       maxAge: 24 * 60 * 60 * 1000
     });
 
-    return res.json({ success: true, token });
+    return res.json({ 
+      success: true, 
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role
+      }
+    });
   } catch (error) {
     console.error('Signin error:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
