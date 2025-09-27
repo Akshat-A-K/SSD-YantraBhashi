@@ -74,6 +74,7 @@ export default function CodeEditor({
     folding: true,
     bracketPairColorization: { enabled: true }
   });
+  const [decorationIds, setDecorationIds] = useState([]);
 
   const editorRef = useRef(null);
 
@@ -102,34 +103,30 @@ export default function CodeEditor({
   useEffect(() => {
     if (editorRef.current) {
       try {
-        if (validationErrors.length > 0) {
-          const model = editorRef.current.getModel();
-          if (model) {
-            const decorations = validationErrors.map(error => ({
-              range: {
-                startLineNumber: error.line_no,
-                startColumn: 1,
-                endLineNumber: error.line_no,
-                endColumn: model.getLineMaxColumn(error.line_no)
-              },
-              options: {
-                isWholeLine: true,
-                className: 'error-line-highlight',
-                glyphMarginClassName: 'error-glyph'
-              }
-            }));
-            
-            editorRef.current.deltaDecorations([], decorations);
-          }
-        } else {
-          // Clear markers when no errors
-          editorRef.current.deltaDecorations([], []);
+        const model = editorRef.current.getModel();
+        if (model) {
+          const newDecorations = validationErrors.map(error => ({
+            range: {
+              startLineNumber: error.line_no,
+              startColumn: 1,
+              endLineNumber: error.line_no,
+              endColumn: model.getLineMaxColumn(error.line_no)
+            },
+            options: {
+              isWholeLine: true,
+              className: 'error-line-highlight',
+              glyphMarginClassName: 'error-glyph'
+            }
+          }));
+          
+          const newIds = editorRef.current.deltaDecorations(decorationIds, newDecorations);
+          setDecorationIds(newIds);
         }
       } catch (error) {
         console.error('Error with markers:', error);
       }
     }
-  }, [validationErrors]);
+  }, [validationErrors, decorationIds]);
 
   const handleEditorChange = useCallback((value) => {
     setCode(value || "");
