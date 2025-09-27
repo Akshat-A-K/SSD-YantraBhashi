@@ -1,34 +1,49 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import AuthCard from "./components/AuthCard";
 import CodeEditor from "./components/CodeEditor";
 import "./style.css";
 
 export default function App() {
-  const [user, setUser] = React.useState(null);
-  const [status, setStatus] = React.useState("");
+  const [user, setUser] = useState(null);
+  const [status, setStatus] = useState("");
+  const [code, setCode] = useState("");
 
-  const handleAuth = (u) => {
+  const handleAuth = useCallback((u) => {
     setUser(u);
     setStatus("");
-  };
+  }, []);
 
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     setUser(null);
     setStatus("");
-  };
+  }, []);
 
-  const handleValidate = (code) => {
-    setStatus("Request sent. Waiting for backend...");
+  const handleValidate = useCallback((code) => {
+    setStatus("Code validation requested...");
     console.log("[frontend] Validate requested:", code.slice(0, 120));
     setTimeout(() => setStatus(""), 2000);
-  };
+  }, []);
+
+  const handleCodeChange = useCallback((newCode) => {
+    setCode(newCode);
+  }, []);
+
+  const handleInsertSample = useCallback(() => {
+    setStatus("Sample code loaded");
+    setTimeout(() => setStatus(""), 1500);
+  }, []);
+
+  const handleAISuggestion = useCallback((code) => {
+    setStatus("AI suggestion feature - backend integration pending");
+    console.log("[frontend] AI suggestion requested for code:", code.slice(0, 100));
+    setTimeout(() => setStatus(""), 3000);
+  }, []);
 
   return (
     <div className="app">
       <header className="app-header">
         <div className="brand">
-          <span className="logo">YB</span>
-          <h1>Yantrabhashi Playground</h1>
+          <h1>Code Editor</h1>
         </div>
         {user && (
           <div className="user-row">
@@ -46,17 +61,21 @@ export default function App() {
         ) : (
           <div className="editor-panel">
             <CodeEditor
-              defaultTheme="light"
+              defaultTheme="vs-dark"
+              initialCode={code}
               onValidate={handleValidate}
-              onInsertSample={() => console.log("[frontend] Insert sample clicked")}
+              onInsertSample={handleInsertSample}
+              onChange={handleCodeChange}
+              onAISuggestion={handleAISuggestion}
+              height="600px"
             />
-            {status ? <div className="status">{status}</div> : null}
+            {status && <div className="status">{status}</div>}
           </div>
         )}
       </main>
 
       <footer className="app-footer">
-        <p>Pure frontend demo. Backend will be connected separately.</p>
+        <p>Code Editor - Student Project</p>
       </footer>
     </div>
   );
