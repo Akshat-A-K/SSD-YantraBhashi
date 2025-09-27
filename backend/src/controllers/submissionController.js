@@ -34,7 +34,7 @@ export async function validateCode(req, res) {
 
     await newSubmission.save();
 
-    return res.status(201).json({ success: true, submissionId: newSubmission.id });
+    return res.status(201).json({ success: true, is_valid: (errors.length===0),errors:errors, submissionId: newSubmission.id });
   } catch (error) {
     console.error('Error validating code:', error);
     return res.status(500).json({ success: false, message: 'Server error' });
