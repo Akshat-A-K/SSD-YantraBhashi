@@ -1,0 +1,205 @@
+/* Minimal design system with CSS variables and 3-5 colors */
+
+/* Reset-ish */
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  background: #0b1220; /* neutral dark bg */
+  color: #e2e8f0; /* neutral foreground */
+}
+
+/* Layout */
+.app-header,
+.app-footer {
+  border-bottom: 1px solid rgba(226, 232, 240, 0.1);
+}
+.app-footer {
+  border-bottom: 0;
+  border-top: 1px solid rgba(226, 232, 240, 0.1);
+}
+
+.app-header .container,
+.app-footer .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.container {
+  max-width: 960px;
+  padding: 24px 20px;
+  margin: 0 auto;
+}
+
+.title {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin: 0;
+}
+
+/* Cards */
+.card {
+  background: #0e1626;
+  border: 1px solid rgba(226, 232, 240, 0.12);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.card-header {
+  margin-bottom: 12px;
+}
+.card-title {
+  margin: 0 0 4px;
+  font-size: 20px;
+}
+.card-desc {
+  margin: 0;
+  color: #94a3b8;
+}
+
+.auth-card .actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Form */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 10px 0;
+}
+.label {
+  font-size: 12px;
+  color: #94a3b8;
+}
+.input,
+.select,
+.btn {
+  font: inherit;
+}
+.input,
+.select {
+  color: #e2e8f0;
+  background: #0b1322;
+  border: 1px solid rgba(226, 232, 240, 0.16);
+  border-radius: 8px;
+  padding: 10px 12px;
+  outline: none;
+}
+.input:focus,
+.select:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.15);
+}
+
+/* Buttons */
+.btn {
+  border: 1px solid transparent;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #0b1220;
+  background: #2563eb; /* primary brand */
+}
+.btn:hover {
+  filter: brightness(1.05);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #e2e8f0;
+  border: 1px solid rgba(226, 232, 240, 0.16);
+}
+.btn-ghost:hover {
+  background: rgba(226, 232, 240, 0.06);
+}
+
+/* Toolbar */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.toolbar-left,
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Editor */
+.editor-card {
+  /* These are overridden by inline style from themeMap per selection */
+  --editor-bg: #ffffff;
+  --editor-fg: #0f172a;
+  --editor-gutter: #e2e8f0;
+  --editor-accent: #2563eb;
+  --editor-subtle: #64748b;
+}
+
+.editor {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  border: 1px solid var(--editor-gutter);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--editor-bg);
+  color: var(--editor-fg);
+}
+
+.gutter {
+  background: color-mix(in oklab, var(--editor-bg), #000 8%);
+  border-right: 1px solid var(--editor-gutter);
+  overflow: auto;
+  max-height: 420px;
+}
+
+.gutter-line {
+  height: 24px;
+  line-height: 24px;
+  text-align: right;
+  padding: 0 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  color: var(--editor-subtle);
+  border-bottom: 1px solid color-mix(in oklab, var(--editor-bg), #000 6%);
+}
+
+.code {
+  background: transparent;
+  color: var(--editor-fg);
+  border: 0;
+  padding: 8px 10px;
+  resize: none;
+  outline: none;
+  width: 100%;
+  min-height: 240px;
+  height: 420px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 14px;
+  line-height: 24px;
+  overflow: auto;
+}
+
+/* Footer */
+.muted {
+  color: #94a3b8;
+  font-size: 13px;
+}
