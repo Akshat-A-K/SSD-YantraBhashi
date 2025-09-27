@@ -56,13 +56,14 @@ export class SubmissionService {
             if (!line || line.startsWith('#')) continue;
 
             //closing block
-            if (line === ']') {
+            if (line.startsWith(']')) {
                 if (open_blocks.length === 0) {
                     this.error_list.push({ line: line_num, message: `Unmatched closing bracket ']'` });
                 } else {
                     open_blocks.pop();
                 }
-                continue;
+                line = line.substring(1).trim();
+                if (!line) continue;
             }
 
             //opening block
