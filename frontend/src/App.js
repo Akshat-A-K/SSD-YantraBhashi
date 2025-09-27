@@ -1,27 +1,50 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import AuthCard from "./components/AuthCard";
 import CodeEditor from "./components/CodeEditor";
+import InstructorDashboard from "./components/InstructorDashboard";
+import apiService from "./services/apiService";
 import "./style.css";
 
 export default function App() {
   const [user, setUser] = useState(null);
   const [status, setStatus] = useState("");
   const [code, setCode] = useState("");
+  const [instructorFeedback, setInstructorFeedback] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleAuth = useCallback((u) => {
     setUser(u);
     setStatus("");
+    // Save user to localStorage for persistence
+    localStorage.setItem('user', JSON.stringify(u));
   }, []);
 
-  const handleSignOut = useCallback(() => {
-    setUser(null);
-    setStatus("");
+  const handleSignOut = useCallback(async () => {
+    try {
+      await apiService.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setUser(null);
+      setStatus("");
+      // Clear user from localStorage
+      localStorage.removeItem('user');
+    }
   }, []);
 
-  const handleValidate = useCallback((code) => {
-    setStatus("Code validation requested...");
-    console.log("[frontend] Validate requested:", code.slice(0, 120));
-    setTimeout(() => setStatus(""), 2000);
+  const handleValidate = useCallback(async (code) => {
+    setStatus("Validating code...");
+    try {
+      const response = await apiService.validateCode(code);
+      if (response.success) {
+        setStatus("Code validated successfully!");
+      } else {
+        setStatus("Code validation failed. Check for errors.");
+      }
+    } catch (error) {
+      setStatus("Validation error: " + error.message);
+    }
+    setTimeout(() => setStatus(""), 3000);
   }, []);
 
   const handleCodeChange = useCallback((newCode) => {
@@ -39,6 +62,62 @@ export default function App() {
     setTimeout(() => setStatus(""), 3000);
   }, []);
 
+  // Restore user from localStorage on page load
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        const userData = JSON.parse(savedUser);
+        setUser(userData);
+      } catch (error) {
+        console.error("Error parsing saved user:", error);
+        localStorage.removeItem('user');
+      }
+    }
+    setIsLoading(false);
+  }, []);
+
+  // Clear feedback when user changes
+  useEffect(() => {
+    setInstructorFeedback(null);
+  }, [user?.id]);
+
+  // Load instructor feedback for students
+  useEffect(() => {
+    if (user && user.role === "student") {
+      const loadFeedback = async () => {
+        try {
+          const response = await apiService.getUserSubmissions();
+          
+          // Get submissions for the current user only
+          const userSubmissions = response.items || response.submissions || [];
+          
+          // Get the latest submission with feedback for this specific user
+          const userSpecificSubmissions = userSubmissions.filter(sub => {
+            const isUserMatch = sub.user_id === user.id || sub.userId === user.id;
+            return isUserMatch;
+          });
+          
+          const latestSubmission = userSpecificSubmissions
+            .find(sub => sub.instructor_feedback && sub.instructor_feedback.trim() !== '');
+          
+          if (latestSubmission?.instructor_feedback) {
+            setInstructorFeedback(latestSubmission.instructor_feedback);
+          } else {
+            setInstructorFeedback(null);
+          }
+        } catch (error) {
+          console.error("Error loading feedback:", error);
+          setInstructorFeedback(null);
+        }
+      };
+      loadFeedback();
+    } else {
+      // Clear feedback for non-students
+      setInstructorFeedback(null);
+    }
+  }, [user]);
+
   return (
     <div className="app">
       <header className="app-header">
@@ -50,7 +129,7 @@ export default function App() {
         </div>
         {user && (
           <div className="user-row">
-            <span className="user-email">{user.email}</span>
+            <span className="user-email">{user.username} ({user.role})</span>
             <button className="btn btn-ghost" onClick={handleSignOut}>
               Sign out
             </button>
@@ -59,8 +138,15 @@ export default function App() {
       </header>
 
       <main className="app-main">
-        {!user ? (
+        {isLoading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Loading...</p>
+          </div>
+        ) : !user ? (
           <AuthCard onAuth={handleAuth} />
+        ) : user.role === "instructor" ? (
+          <InstructorDashboard user={user} onSignOut={handleSignOut} />
         ) : (
           <div className="editor-panel">
             <CodeEditor
@@ -71,6 +157,7 @@ export default function App() {
               onChange={handleCodeChange}
               onAISuggestion={handleAISuggestion}
               height="600px"
+              instructorFeedback={instructorFeedback}
             />
             {status && <div className="status">{status}</div>}
           </div>
