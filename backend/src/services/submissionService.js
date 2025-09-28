@@ -95,7 +95,7 @@ export class SubmissionService {
                 open_blocks.push({ line: line_num });
             }
 
-            let decl_match = line.match(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)\s*(=\s*([^;]+))?\s*;/s);
+            let decl_match = line.match(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)\s*(=\s*([^;]+))?\s*;+/s);
             if (decl_match) {
                 const var_name = decl_match[1];
                 const var_type = decl_match[2];
@@ -142,8 +142,8 @@ export class SubmissionService {
                 if (!line) continue;
             }
 
-            let print_match = line.match(/^CHATIMPU\s*\(\s*(.*?)\s*\)\s*;/s);
-            let scan_match = line.match(/^CHEPPU\s*\(\s*(.*?)\s*\)\s*;/s);
+            let print_match = line.match(/^CHATIMPU\s*\(\s*(.*?)\s*\)\s*;+/s);
+            let scan_match = line.match(/^CHEPPU\s*\(\s*(.*?)\s*\)\s*;+/s);
             if (print_match || scan_match) {
                 const var_name = (print_match ? print_match[1] : scan_match[1]).trim();
                 if (var_name.startsWith('"') && var_name.endsWith('"')) {
@@ -152,7 +152,7 @@ export class SubmissionService {
                     this.error_list.push({ line: line_num, message: `Undeclared variable '${var_name}' in ${print_match ? "print" : "scan"}.` });
                 }
                 // Remove the matched statement from the line and continue processing the rest
-                line = line.replace(/^(CHATIMPU|CHEPPU)\s*\(\s*.*?\s*\)\s*;\s*/s, '').trim();
+                line = line.replace(/^(CHATIMPU|CHEPPU)\s*\(\s*.*?\s*\)\s*;+\s*/s, '').trim();
                 if (!line) continue;
             }
 
