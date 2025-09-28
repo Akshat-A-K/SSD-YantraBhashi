@@ -23,27 +23,27 @@ export class SubmissionService {
             if (!line_buffer) buffer_start_line = i + 1;
             if (current_line.trim() === '' || current_line.trim().startsWith('#')) continue;
 
-            // Remove inline comments from the line
+            
             let processed_line = current_line.replace(/#.*$/, '').trim();
             if (!processed_line) continue;
 
-            // Check for unclosed string literals that would span multiple lines
+            
             if (line_buffer) {
                 const combined = line_buffer + '\n' + processed_line;
-                // Check if there's an unclosed quote from previous lines
+                
                 const quote_matches = line_buffer.match(/"/g);
                 if (quote_matches && quote_matches.length % 2 === 1) {
-                    // Odd number of quotes means unclosed string
+                    
                     this.error_list.push({ line: buffer_start_line, message: `Invalid string literal: String cannot span multiple lines.` });
-                    // Skip this problematic section
+                    
                     line_buffer = '';
                     continue;
                 }
             }
 
-            // Check for incomplete statements before adding to buffer
+            
             if (line_buffer && !in_loop_header) {
-                // Check if current line buffer looks like a complete statement but is missing semicolon
+                
                 if (line_buffer.match(/^(CHATIMPU|CHEPPU)\s*\([^)]*\)\s*$/s) && 
                     !processed_line.match(/^(CHATIMPU|CHEPPU|PADAM|ELAITHE|ALAITHE|MALLI-MALLI|\w+\s*=)/)) {
                     this.error_list.push({ line: buffer_start_line, message: `Missing semicolon.` });
@@ -54,7 +54,7 @@ export class SubmissionService {
 
             line_buffer += (line_buffer ? '\n' : '') + processed_line;
             
-            // Check if we're entering a loop header (can be anywhere in the line buffer)
+            
             if (!in_loop_header && /MALLI-MALLI\s*\(/.test(line_buffer)) {
                 in_loop_header = true;
             }
@@ -138,12 +138,12 @@ export class SubmissionService {
                         }
                     }
                 }
-                // Remove the matched declaration from the line and continue processing the rest
+                
                 line = line.replace(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)\s*(=\s*([^;]+))?\s*;+\s*/s, '').trim();
                 if (!line) continue;
             }
 
-            // Check for invalid PADAM syntax (missing semicolon)
+            
             if (line.match(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)(\s*(=\s*([^;]+)))?$/s)) {
                 this.error_list.push({ line: line_num, message: `Missing semicolon in variable declaration.` });
                 continue;
@@ -162,12 +162,12 @@ export class SubmissionService {
                         this.error_list.push({ line: line_num, message: `Type mismatch: Cannot assign ${this.get_expression_type_description(var_expr)} to ${expected_type === "ANKHE" ? "integer" : "string"} variable '${var_name}'.` });
                     }
                 }
-                // Remove the matched assignment from the line and continue processing the rest
+                
                 line = line.replace(/^(\w+)\s*=\s*([^;]+)\s*;+\s*/s, '').trim();
                 if (!line) continue;
             }
 
-            // Check for any string literals containing newlines
+            
             if (line.includes('"') && line.includes('\n')) {
                 const string_with_newline = line.match(/"[^"]*\n[^"]*"/);
                 if (string_with_newline) {
@@ -181,11 +181,11 @@ export class SubmissionService {
             if (print_match || scan_match) {
                 const var_name = (print_match ? print_match[1] : scan_match[1]).trim();
                 if (var_name.startsWith('"') && var_name.endsWith('"')) {
-                    //string literal in print
+                    
                 } else if (!this.variable_table[var_name]) {
                     this.error_list.push({ line: line_num, message: `Undeclared variable '${var_name}' in ${print_match ? "print" : "scan"}.` });
                 }
-                // Remove the matched statement from the line and continue processing the rest
+                
                 line = line.replace(/^(CHATIMPU|CHEPPU)\s*\(\s*.*?\s*\)\s*;+\s*/s, '').trim();
                 if (!line) continue;
             }
@@ -200,7 +200,7 @@ export class SubmissionService {
                 continue;
             }
 
-            // Check for invalid ALAITHE syntax (with semicolon)
+            
             if (line.match(/^ALAITHE\s*;\s*\[$/)) {
                 this.error_list.push({ line: line_num, message: `Invalid ALAITHE syntax. Remove semicolon before '['.` });
                 continue;
@@ -227,19 +227,19 @@ export class SubmissionService {
                 continue;
             }
 
-            // Check for CHATIMPU/CHEPPU statements missing semicolons
+            
             if (line.match(/^CHATIMPU\s*\([^)]*\)\s*$/s) || line.match(/^CHEPPU\s*\([^)]*\)\s*$/s)) {
                 this.error_list.push({ line: line_num, message: `Missing semicolon.` });
                 continue;
             }
 
-            // Check for assignment statements missing semicolons
+            
             if (line.match(/^\w+\s*=\s*[^;]+$/s)) {
                 this.error_list.push({ line: line_num, message: `Missing semicolon.` });
                 continue;
             }
 
-            // Check for variable declarations missing semicolons
+            
             if (line.match(/^PADAM\s+\w+\s*:\s*(VARTTAI|ANKHE)(\s*=\s*[^;]+)?\s*$/s)) {
                 this.error_list.push({ line: line_num, message: `Missing semicolon.` });
                 continue;
@@ -363,7 +363,7 @@ export class SubmissionService {
     }
 
     validate_loop(header, line_num) {
-        // Remove all newlines and normalize whitespace
+        
         const normalized_header = header.replace(/\s+/g, ' ').trim();
         
         if (normalized_header.includes(';;')) {
