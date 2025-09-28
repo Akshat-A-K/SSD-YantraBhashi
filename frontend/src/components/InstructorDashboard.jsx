@@ -18,21 +18,39 @@ export default function InstructorDashboard({ user, onSignOut }) {
 
   useEffect(() => {
     if (!selectedStudent) return;
-    let intervalId;
-    async function fetchSubmissions() {
-      setLoading(true);
+
+    let cancelled = false;
+    let timeoutId = null;
+    const inFlight = { current: false };
+
+    const fetchSubmissions = async (showSpinner = false) => {
+      if (cancelled || inFlight.current) return;
+      inFlight.current = true;
+      if (showSpinner) setLoading(true);
       try {
         const response = await apiService.getStudentSubmissions(selectedStudent.id);
-        setSubmissions(response.submissions || []);
+        if (!cancelled) {
+          setSubmissions(response.submissions || []);
+        }
       } catch (error) {
-        setStatus("Error loading submissions: " + error.message);
+        if (!cancelled) {
+          setStatus("Error loading submissions: " + error.message);
+        }
       } finally {
-        setLoading(false);
+        inFlight.current = false;
+        if (!cancelled) {
+          if (showSpinner) setLoading(false);
+          timeoutId = setTimeout(() => fetchSubmissions(false), 4000);
+        }
       }
-    }
-    fetchSubmissions();
-    intervalId = setInterval(fetchSubmissions, 4000);
-    return () => clearInterval(intervalId);
+    };
+
+    fetchSubmissions(true);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [selectedStudent]);
 
   
