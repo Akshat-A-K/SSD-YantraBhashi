@@ -80,8 +80,8 @@ Install dependencies and Run Frontend
 ### Notes
 - The AI correction service tries configured providers in order (OpenAI, Google Gemini) and falls back to a rule-based correction if providers are unavailable or return invalid responses.
 - To enable AI providers, set API keys in the backend environment variables. Ensure keys are valid and have sufficient quota.
+- Sometimes, AI suggestions may return responses that are not in the expected format. In such cases, the displayed notes may not be perfect.
 - CORS is configured to allow the frontend origin (set FRONTEND_ORIGIN in .env).
-
 
 ## Screenshots
 
