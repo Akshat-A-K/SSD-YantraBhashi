@@ -55,6 +55,7 @@ export default function CodeEditor({
   const [message, setMessage] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSuggestion, setAiSuggestion] = useState(null);
+  const [showAiOverlay, setShowAiOverlay] = useState(false);
   const [validationErrors, setValidationErrors] = useState([]);
   const [isValidating, setIsValidating] = useState(false);
   const [editorOptions] = useState({
@@ -186,7 +187,8 @@ export default function CodeEditor({
 
   const handleAISuggestion = useCallback(async () => {
     setAiLoading(true);
-  setMessage("AI suggestion requested");
+    setShowAiOverlay(true);
+    setMessage("AI suggestion requested");
     try {
       let result;
       if (typeof onAISuggestion === 'function') {
@@ -213,6 +215,7 @@ export default function CodeEditor({
     } finally {
       setAiLoading(false);
       setTimeout(() => setMessage(""), 3000);
+      setTimeout(() => setShowAiOverlay(false), 500);
     }
   }, [code, onAISuggestion]);
 
@@ -273,7 +276,13 @@ export default function CodeEditor({
   }, [onChange]);
 
   return (
-    <div className="simple-editor">
+  <div className="simple-editor" style={{ position: 'relative' }}>
+      {showAiOverlay && (
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: '#fff9', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="loading-spinner" style={{ marginBottom: 12 }}></div>
+          <div style={{ fontWeight: 600, color: '#2563eb', fontSize: 18 }}>AI is analyzing your code...</div>
+        </div>
+      )}
       <div className="editor-toolbar">
         <div className="toolbar-left">
           <div className="toolbar-group">
@@ -366,17 +375,15 @@ export default function CodeEditor({
 
       {/* AI Suggestion Preview Panel */}
       {aiSuggestion && (
-        <div className="ai-suggestion-panel">
-          <div className="ai-suggestion-header">
-            <h4>AI Suggestion Preview</h4>
-            <div className="ai-suggestion-notes">{aiSuggestion.notes}</div>
+        <div className="ai-suggestion-panel" style={{ margin: '18px 0', padding: '16px', background: '#f1f5f9', borderRadius: '8px', boxShadow: '0 2px 8px #0001', position: 'relative', zIndex: 11 }}>
+          <h3 style={{ margin: '0 0 8px', fontWeight: 700, color: '#2563eb' }}>AI Suggestion</h3>
+          <div style={{ marginBottom: 10 }}>
+            <strong>Notes:</strong> {aiSuggestion.notes || "No notes provided."}
           </div>
-          <div className="ai-suggestion-content">
-            <pre className="ai-suggestion-pre">{aiSuggestion.correctedCode}</pre>
-          </div>
-          <div className="ai-suggestion-actions">
-            <button className="btn" onClick={() => handleApplySuggestion(true)}>Apply</button>
-            <button className="btn btn-ghost" onClick={() => handleApplySuggestion(false)}>Dismiss</button>
+          <pre style={{ background: '#fff', padding: '10px', borderRadius: '6px', fontSize: '13px', marginBottom: 10 }}>{aiSuggestion.correctedCode}</pre>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button className="btn btn-primary" onClick={() => handleApplySuggestion(true)}>Apply</button>
+            <button className="btn btn-secondary" onClick={() => handleApplySuggestion(false)}>Dismiss</button>
           </div>
         </div>
       )}
@@ -389,17 +396,6 @@ export default function CodeEditor({
         </div>
       )}
 
-      {/* Instructor Feedback */}
-      {instructorFeedback && (
-        <div className="instructor-feedback">
-      <div className="feedback-header">
-        <h4>Instructor Feedback</h4>
-          </div>
-          <div className="feedback-content">
-            <p>{instructorFeedback}</p>
-          </div>
-        </div>
-      )}
 
       {message && (
         <div className="editor-message">

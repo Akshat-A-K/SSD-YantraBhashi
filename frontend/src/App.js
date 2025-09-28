@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from "react";
 import AuthCard from "./components/AuthCard";
 import CodeEditor from "./components/CodeEditor";
 import InstructorDashboard from "./components/InstructorDashboard";
+import StudentSubmissions from "./components/StudentSubmissions";
 import apiService from "./services/apiService";
 import "./style.css";
 
@@ -130,24 +131,24 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <div className="brand">
-          <h1 className="brand-title">
-            <span className="brand-yantra">Yantra</span>
-            <span className="brand-bhashi">Bhashi</span>
-          </h1>
-        </div>
-        {user && (
+      {user && (
+        <header className="app-header">
+          <div className="brand">
+            <h1 className="brand-title">
+              <span className="brand-yantra">Yantra</span>
+              <span className="brand-bhashi">Bhashi</span>
+            </h1>
+          </div>
           <div className="user-row">
             <span className="user-email">{user.username} ({user.role})</span>
             <button className="btn btn-ghost" onClick={handleSignOut}>
               Sign out
             </button>
           </div>
-        )}
-      </header>
+        </header>
+      )}
 
-      <main className="app-main">
+      <main className={user ? "app-main" : "app-main auth"}>
         {isLoading ? (
           <div className="loading-container">
             <div className="loading-spinner"></div>
@@ -158,18 +159,23 @@ export default function App() {
         ) : user.role === "instructor" ? (
           <InstructorDashboard user={user} onSignOut={handleSignOut} />
         ) : (
-          <div className="editor-panel">
-            <CodeEditor
-              defaultTheme="vs-dark"
-              initialCode={code}
-              onValidate={handleValidate}
-              onInsertSample={handleInsertSample}
-              onChange={handleCodeChange}
-              onAISuggestion={handleAISuggestion}
-              height="600px"
-              instructorFeedback={instructorFeedback}
-            />
-            {status && <div className="status">{status}</div>}
+          <div className="main-flex-row" style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
+            <div className="submissions-sidebar" style={{ minWidth: '340px', maxWidth: '400px', flex: '0 0 340px' }}>
+              <StudentSubmissions user={user} />
+            </div>
+            <div className="editor-panel" style={{ flex: 1 }}>
+              <CodeEditor
+                defaultTheme="vs-dark"
+                initialCode={code}
+                onValidate={handleValidate}
+                onInsertSample={handleInsertSample}
+                onChange={handleCodeChange}
+                onAISuggestion={handleAISuggestion}
+                height="600px"
+                instructorFeedback={instructorFeedback}
+              />
+              {status && <div className="status">{status}</div>}
+            </div>
           </div>
         )}
       </main>

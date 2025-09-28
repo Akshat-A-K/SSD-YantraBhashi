@@ -16,6 +16,25 @@ export default function InstructorDashboard({ user, onSignOut }) {
   const [feedbackText, setFeedbackText] = useState("");
   const [submittingFeedback, setSubmittingFeedback] = useState(false);
 
+  useEffect(() => {
+    if (!selectedStudent) return;
+    let intervalId;
+    async function fetchSubmissions() {
+      setLoading(true);
+      try {
+        const response = await apiService.getStudentSubmissions(selectedStudent.id);
+        setSubmissions(response.submissions || []);
+      } catch (error) {
+        setStatus("Error loading submissions: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSubmissions();
+    intervalId = setInterval(fetchSubmissions, 4000);
+    return () => clearInterval(intervalId);
+  }, [selectedStudent]);
+
   // Load students from API
   useEffect(() => {
     const loadStudents = async () => {
@@ -26,7 +45,6 @@ export default function InstructorDashboard({ user, onSignOut }) {
         setFilteredStudents(response.students);
       } catch (error) {
         setStatus("Error loading students: " + error.message);
-        // Fallback to mock data if API fails
         const mockStudents = [
           { id: 1, username: "john_doe", email: "john@example.com", submissionsCount: 3 },
           { id: 2, username: "jane_smith", email: "jane@example.com", submissionsCount: 2 },
