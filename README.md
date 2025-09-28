@@ -83,6 +83,18 @@ Install dependencies and Run Frontend
 - Sometimes, AI suggestions may return responses that are not in the expected format. In such cases, the displayed notes may not be perfect.
 - CORS is configured to allow the frontend origin (set FRONTEND_ORIGIN in .env).
 
+
+## Contributors
+
+**Team Number:** 1
+
+- Parv Shah - 2025201093
+- Gaurav Patel - 2025201065
+- Jewel Joseph - 2025201047
+- Akshat Kotadia - 2025201005
+- Eshwar Pingili - 2025204030
+
+
 ## Screenshots
 
 ![signup](https://github.com/user-attachments/assets/1fb31a7f-c11c-40e5-abba-e70de407ed4d)
