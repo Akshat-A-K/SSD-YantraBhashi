@@ -23,10 +23,17 @@ export class SubmissionService {
             if (!line_buffer) buffer_start_line = i + 1;
             if (current_line.trim() === '' || current_line.trim().startsWith('#')) continue;
 
-            if (!in_loop_header && current_line.trim().startsWith('MALLI-MALLI(')) {
+            // Remove inline comments from the line
+            let processed_line = current_line.replace(/#.*$/, '').trim();
+            if (!processed_line) continue;
+
+            line_buffer += (line_buffer ? '\n' : '') + processed_line;
+            
+            // Check if we're entering a loop header (can be anywhere in the line buffer)
+            if (!in_loop_header && /MALLI-MALLI\s*\(/.test(line_buffer)) {
                 in_loop_header = true;
             }
-            line_buffer += (line_buffer ? '\n' : '') + current_line.trim();
+            
             if (in_loop_header) {
                 if (/\)\s*\[$/.test(line_buffer)) {
                     processed_lines.push({ text: line_buffer, line_num: buffer_start_line });
@@ -71,6 +78,12 @@ export class SubmissionService {
                 if (remaining.match(/^ALAITHE\s*\[$/)) {
                     open_blocks.push({ line: line_num, type: 'ALAITHE' });
                     continue;
+                } else if (remaining.match(/^ALAITHE\s*;\s*\[$/)) {
+                    this.error_list.push({ line: line_num, message: `Invalid syntax: Remove semicolon between '] ALAITHE' and '['.` });
+                    continue;
+                } else if (remaining.match(/^;\s*ALAITHE\s*\[$/)) {
+                    this.error_list.push({ line: line_num, message: `Invalid syntax: Remove semicolon between ']' and 'ALAITHE'.` });
+                    continue;
                 } else if (remaining) {
                     line = remaining;
                 } else {
@@ -82,7 +95,7 @@ export class SubmissionService {
                 open_blocks.push({ line: line_num });
             }
 
-            let decl_match = line.match(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)\s*(=\s*(.+))?\s*;$/s);
+            let decl_match = line.match(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)\s*(=\s*([^;]+))?\s*;/s);
             if (decl_match) {
                 const var_name = decl_match[1];
                 const var_type = decl_match[2];
@@ -100,39 +113,47 @@ export class SubmissionService {
                         }
                     }
                 }
+                // Remove the matched declaration from the line and continue processing the rest
+                line = line.replace(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)\s*(=\s*([^;]+))?\s*;\s*/s, '').trim();
+                if (!line) continue;
+            }
+
+            // Check for invalid PADAM syntax (missing semicolon)
+            if (line.match(/^PADAM\s+(\w+)\s*:\s*(VARTTAI|ANKHE)(\s*(=\s*([^;]+)))?$/s)) {
+                this.error_list.push({ line: line_num, message: `Missing semicolon in variable declaration.` });
                 continue;
             }
 
-            let assign_match = line.match(/^(\w+)\s*=\s*(.+);$/s);
+            let assign_match = line.match(/^(\w+)\s*=\s*([^;]+)\s*;/s);
             if (assign_match) {
                 const var_name = assign_match[1];
-                let var_expr = assign_match[2].trim();
-                
-                if (var_expr.endsWith(';')) {
-                    var_expr = var_expr.slice(0, -1).trim();
-                }
+                const var_expr = assign_match[2];
                 
                 if (!this.variable_table[var_name]) {
                     this.error_list.push({ line: line_num, message: `Undeclared variable '${var_name}'.` });
                 } else {
                     const expected_type = this.variable_table[var_name];
-                    if (!this.check_expr_type(expected_type, var_expr)) {
+                    if (!this.check_expr_type(expected_type, var_expr.trim())) {
                         this.error_list.push({ line: line_num, message: `Type mismatch: Cannot assign ${this.get_expression_type_description(var_expr)} to ${expected_type === "ANKHE" ? "integer" : "string"} variable '${var_name}'.` });
                     }
                 }
-                continue;
+                // Remove the matched assignment from the line and continue processing the rest
+                line = line.replace(/^(\w+)\s*=\s*([^;]+)\s*;\s*/s, '').trim();
+                if (!line) continue;
             }
 
-            let print_match = line.match(/^CHATIMPU\((.+)\);$/);
-            let scan_match = line.match(/^CHEPPU\((.+)\);$/);
+            let print_match = line.match(/^CHATIMPU\s*\(\s*(.*?)\s*\)\s*;/s);
+            let scan_match = line.match(/^CHEPPU\s*\(\s*(.*?)\s*\)\s*;/s);
             if (print_match || scan_match) {
                 const var_name = (print_match ? print_match[1] : scan_match[1]).trim();
                 if (var_name.startsWith('"') && var_name.endsWith('"')) {
-                    
+                    //string literal in print
                 } else if (!this.variable_table[var_name]) {
                     this.error_list.push({ line: line_num, message: `Undeclared variable '${var_name}' in ${print_match ? "print" : "scan"}.` });
                 }
-                continue;
+                // Remove the matched statement from the line and continue processing the rest
+                line = line.replace(/^(CHATIMPU|CHEPPU)\s*\(\s*.*?\s*\)\s*;\s*/s, '').trim();
+                if (!line) continue;
             }
 
             let if_start = line.match(/^ELAITHE\s*\((.+)\)\s*\[$/);
@@ -142,6 +163,12 @@ export class SubmissionService {
 
             let else_start = line.match(/^ALAITHE\s*\[$/);
             if (else_start) {
+                continue;
+            }
+
+            // Check for invalid ALAITHE syntax (with semicolon)
+            if (line.match(/^ALAITHE\s*;\s*\[$/)) {
+                this.error_list.push({ line: line_num, message: `Invalid ALAITHE syntax. Remove semicolon before '['.` });
                 continue;
             }
 
@@ -284,11 +311,14 @@ export class SubmissionService {
     }
 
     validate_loop(header, line_num) {
-        if (header.includes(';;')) {
+        // Remove all newlines and normalize whitespace
+        const normalized_header = header.replace(/\s+/g, ' ').trim();
+        
+        if (normalized_header.includes(';;')) {
             return false;
         }
         
-        const parts = header.split(';');
+        const parts = normalized_header.split(';');
         
         if (parts.length !== 3) {
             return false;
