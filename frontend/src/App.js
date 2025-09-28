@@ -88,22 +88,22 @@ export default function App() {
     setIsLoading(false);
   }, []);
 
-  // Clear feedback when user changes
+  
   useEffect(() => {
     setInstructorFeedback(null);
   }, [user?.id]);
 
-  // Load instructor feedback for students
+  
   useEffect(() => {
     if (user && user.role === "student") {
       const loadFeedback = async () => {
         try {
           const response = await apiService.getUserSubmissions();
           
-          // Get submissions for the current user only
+          
           const userSubmissions = response.items || response.submissions || [];
           
-          // Get the latest submission with feedback for this specific user
+          
           const userSpecificSubmissions = userSubmissions.filter(sub => {
             const isUserMatch = sub.user_id === user.id || sub.userId === user.id;
             return isUserMatch;
@@ -124,7 +124,7 @@ export default function App() {
       };
       loadFeedback();
     } else {
-      // Clear feedback for non-students
+      
       setInstructorFeedback(null);
     }
   }, [user]);

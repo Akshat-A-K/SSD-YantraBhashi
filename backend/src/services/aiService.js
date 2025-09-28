@@ -17,7 +17,7 @@ async function loadAiCorrector() {
   const utilsDir = path.join(__dirname, '..', 'utils');
   const candidates = ['aiCorrector.cjs', 'aiCorrector.js', 'aiCorrector.mjs'];
 
-  // Try to load CommonJS via createRequire first, then fallback to dynamic import
+  
   const req = createRequire(import.meta.url);
 
   for (const fname of candidates) {
@@ -25,13 +25,13 @@ async function loadAiCorrector() {
     if (!fs.existsSync(fullPath)) continue;
 
     try {
-      // Try requiring (works for .cjs and sometimes for .js if CommonJS)
+      
       const mod = req(fullPath);
       aiCorrector = mod && mod.default ? mod.default : mod;
       console.log('\u2705 Loaded AI corrector via require:', fname);
       return aiCorrector;
     } catch (requireErr) {
-      // If require failed, try ESM dynamic import
+      
       try {
         const mod = await import(pathToFileURL(fullPath).href);
         aiCorrector = mod && mod.default ? mod.default : mod;
@@ -39,7 +39,7 @@ async function loadAiCorrector() {
         return aiCorrector;
       } catch (importErr) {
         console.warn('Attempt to load', fname, 'failed (require error, then import error):', requireErr && requireErr.message, importErr && importErr.message);
-        // continue to next candidate
+        
       }
     }
   }
@@ -54,16 +54,16 @@ export async function generateCorrection(code, errors = []) {
 
     const ac = await loadAiCorrector();
     if (ac && typeof ac.correctCodeWithAI === 'function') {
-      // call recovered implementation
+      
       const result = await ac.correctCodeWithAI(code, errors);
       if (result && result.success) {
         return { correctedCode: result.correctedCode, notes: result.corrections && result.corrections.join('; ') };
       }
-      // if result indicates failure, fall through to placeholder
+      
       console.warn('aiCorrector returned no successful result, falling back to placeholder');
     }
 
-    // Placeholder fallback: trim trailing whitespace, remove duplicate blank lines, ensure final newline
+    
     const lines = code.split(/\r?\n/).map(l => l.replace(/\s+$/,''));
     const compressed = [];
     for (let i = 0; i < lines.length; i++) {

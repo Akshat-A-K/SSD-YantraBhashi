@@ -2,12 +2,12 @@ import React from "react";
 import apiService from "../services/apiService";
 
 export default function AuthCard({ onAuth }) {
-  const [mode, setMode] = React.useState("signin"); // 'signin' | 'signup'
+  const [mode, setMode] = React.useState("signin"); 
   const [username, setUsername] = React.useState("");
   const [email, setEmail] = React.useState("");
-  const [identifier, setIdentifier] = React.useState(""); // username or email for signin
+  const [identifier, setIdentifier] = React.useState(""); 
   const [password, setPassword] = React.useState("");
-  const [role, setRole] = React.useState("student"); // 'student' | 'instructor'
+  const [role, setRole] = React.useState("student"); 
   const [error, setError] = React.useState("");
   const [status, setStatus] = React.useState("");
   const [loading, setLoading] = React.useState(false);
@@ -38,7 +38,7 @@ export default function AuthCard({ onAuth }) {
           setLoading(false);
           return;
         }
-        // Build credentials based on identifier
+        
         const credentials = { password };
         if (identifier.includes("@")) {
           credentials.email = identifier.trim();
@@ -48,7 +48,7 @@ export default function AuthCard({ onAuth }) {
         const response = await apiService.signin(credentials);
         
         if (response.success) {
-          // User info is now included in the signin response
+          
           onAuth?.(response.user);
         }
       }

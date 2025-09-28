@@ -5,13 +5,13 @@ export default function StudentSubmissions({ user }) {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // Keep Show Code/Feedback open even after polling refresh
+  
   const [openCodeIds, setOpenCodeIds] = useState(() => new Set());
   const [openFeedbackIds, setOpenFeedbackIds] = useState(() => new Set());
 
   useEffect(() => {
-    // Sequential polling loop that avoids overlapping/network pileups
-    // and React 18 StrictMode double-mount effects
+    
+    
     let cancelled = false;
     let timeoutId = null;
     const inFlight = { current: false };
@@ -19,7 +19,7 @@ export default function StudentSubmissions({ user }) {
     const fetchSubmissions = async () => {
       if (cancelled || inFlight.current || !user?.id) return;
       inFlight.current = true;
-      // Do not toggle global loading after first load to avoid flicker
+      
       setError("");
       try {
         const response = await apiService.getUserSubmissions();
@@ -37,7 +37,7 @@ export default function StudentSubmissions({ user }) {
       }
     };
 
-    // Initial load with loading indicator
+    
     (async () => {
       if (!user?.id) return;
       setLoading(true);

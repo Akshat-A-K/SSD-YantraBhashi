@@ -1,8 +1,8 @@
-// Assuming the SubmissionService class is loaded
+
 const submissionService = new SubmissionService();
 
 const testCases = [
-    // Valid Code: Simple print example
+    
     {
         code: `
         PADAM message:VARTTAI = "Hello World";
@@ -11,7 +11,7 @@ const testCases = [
         expectedErrors: []
     },
 
-    // Valid Code: Addition program with user input
+    
     {
         code: `
         PADAM a:ANKHE;
@@ -26,7 +26,7 @@ const testCases = [
         expectedErrors: []
     },
 
-    // Valid Code: Conditional statement
+    
     {
         code: `
         PADAM username:VARTTAI;
@@ -40,7 +40,7 @@ const testCases = [
         expectedErrors: []
     },
 
-    // Valid Code: Loop to sum first 10 numbers
+    
     {
         code: `
         PADAM i:ANKHE;
@@ -54,7 +54,7 @@ const testCases = [
         expectedErrors: []
     },
 
-    // Invalid Code: Undeclared variable usage
+    
     {
         code: `
         PADAM sum:ANKHE;
@@ -66,7 +66,7 @@ const testCases = [
         ]
     },
 
-    // Invalid Code: Reserved word as variable name
+    
     {
         code: `
         PADAM VARTTAI:VARTTAI = "Test";
@@ -76,7 +76,7 @@ const testCases = [
         ]
     },
 
-    // Invalid Code: Missing semicolon
+    
     {
         code: `
         PADAM a:ANKHE
@@ -86,7 +86,7 @@ const testCases = [
         ]
     },
 
-    // Invalid Code: Malformed loop header (missing increment)
+    
     {
         code: `
         MALLI-MALLI (PADAM i:ANKHE = 1; i <= 10; ) [
@@ -98,7 +98,7 @@ const testCases = [
         ]
     },
 
-    // Invalid Code: Invalid condition in if statement
+    
     {
         code: `
         PADAM age:ANKHE;

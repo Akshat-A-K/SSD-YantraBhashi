@@ -35,7 +35,7 @@ export default function InstructorDashboard({ user, onSignOut }) {
     return () => clearInterval(intervalId);
   }, [selectedStudent]);
 
-  // Load students from API
+  
   useEffect(() => {
     const loadStudents = async () => {
       setLoading(true);
@@ -62,7 +62,7 @@ export default function InstructorDashboard({ user, onSignOut }) {
     loadStudents();
   }, []);
 
-  // Handle search functionality
+  
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setFilteredStudents(students);
@@ -79,14 +79,14 @@ export default function InstructorDashboard({ user, onSignOut }) {
     setSelectedSubmission(null);
     setSubmissions([]);
     
-    // Load submissions for selected student
+    
     setLoading(true);
     try {
       const response = await apiService.getStudentSubmissions(student.id);
       setSubmissions(response.submissions || []);
     } catch (error) {
       setStatus("Error loading submissions: " + error.message);
-      // Fallback to mock data if API fails
+      
       const mockSubmissions = [
         {
           id: 1,
@@ -153,7 +153,7 @@ CHATIMPU(sum);`,
       await apiService.verifySubmission(selectedSubmission.id, feedbackText);
   setStatus("Feedback submitted successfully.");
       
-      // Update the submission in the list
+      
       setSubmissions(prev => prev.map(sub => 
         sub.id === selectedSubmission.id 
           ? { ...sub, instructor_feedback: feedbackText, instructor_verified_at: new Date().toISOString() }
@@ -181,7 +181,7 @@ CHATIMPU(sum);`,
   };
 
   const handleCodeChange = (newCode) => {
-    // For instructor view, code changes are read-only
+    
     console.log("[instructor] Code viewed:", newCode.slice(0, 100));
   };
 
@@ -191,15 +191,15 @@ CHATIMPU(sum);`,
   };
 
   const handleAISuggestion = (code) => {
-    // Call backend AI suggestion endpoint and show result
+    
     (async () => {
       setStatus("Requesting AI suggestion...");
       try {
-  // Provide submission id and any known errors for context
+  
   const res = await apiService.aiSuggest(code, { submissionId: selectedSubmission?.id, errors: selectedSubmission?.errors || [] });
         if (res && (res.correctedCode || res.corrected)) {
           setStatus("AI suggestion received");
-          // Normalize to `correctedCode` for UI consumption
+          
           const normalized = { correctedCode: res.correctedCode || res.corrected, notes: res.notes || res.notes };
           setSelectedSubmission(prev => prev ? { ...prev, aiSuggestion: normalized } : prev);
         } else {
@@ -225,7 +225,7 @@ CHATIMPU(sum);`,
       setStatus('AI suggestion dismissed');
       setTimeout(() => setStatus(''), 1500);
     }
-    // Remove stored aiSuggestion after action
+    
     setSelectedSubmission(prev => prev ? { ...prev, aiSuggestion: undefined } : prev);
   };
 

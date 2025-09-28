@@ -12,8 +12,8 @@ export async function aiTest(req, res) {
   return res.json({ success: true, message: 'AI test OK', sampleResult: result });
 }
 
-// POST /ai/correct
-// body: { code: string, errors: [] }
+
+
 export async function aiCorrect(req, res) {
   try {
     
@@ -50,9 +50,9 @@ export async function aiCorrect(req, res) {
     if (!code && req.headers['x-code']) {
       const header = req.headers['x-code'];
       try {
-        // If looks like base64, decode
+        
         const maybe = Buffer.from(header, 'base64').toString('utf8');
-        // Heuristic: if decoded contains whitespace/newlines, assume decoded content
+        
         if (maybe && /\n|\r|\s/.test(maybe)) {
           code = maybe;
         } else {
@@ -67,7 +67,7 @@ export async function aiCorrect(req, res) {
       return res.status(400).json({ success: false, message: 'Code not provided' });
     }
 
-    // Try to produce a correction via aiService
+    
     const start = Date.now();
     const correction = await generateCorrection(code, errors || []);
     const processingTimeMs = Date.now() - start;
@@ -76,7 +76,7 @@ export async function aiCorrect(req, res) {
       return res.json({ success: true, data: { correctedCode: correction.correctedCode, notes: correction.notes || '', processingTimeMs } });
     }
 
-    // If AI couldn't produce correction, save a fallback submission so it's not lost
+    
     const fallback = new CodeSubmission({
       id: uuidv4(),
       user_id: (req.user && req.user.id) || null,

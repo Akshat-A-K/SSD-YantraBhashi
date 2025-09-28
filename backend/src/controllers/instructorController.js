@@ -3,12 +3,12 @@ import CodeSubmission from '../models/codeSubmission.js';
 
 export async function getAllStudents(req, res) {
   try {
-    // Get all users with role 'student'
+    
     const students = await User.find({ role: 'student' })
       .select('id username email created_at')
       .lean();
 
-    // Get submission counts for each student
+    
     const studentsWithCounts = await Promise.all(
       students.map(async (student) => {
         const submissionCount = await CodeSubmission.countDocuments({ 
@@ -38,7 +38,7 @@ export async function getStudentSubmissions(req, res) {
   try {
     const { studentId } = req.params;
 
-    // Verify the student exists
+    
     const student = await User.findOne({ 
       id: studentId, 
       role: 'student' 
@@ -51,7 +51,7 @@ export async function getStudentSubmissions(req, res) {
       });
     }
 
-    // Get all submissions for this student
+    
     const submissions = await CodeSubmission.find({ user_id: studentId })
       .sort({ submitted_at: -1 })
       .lean();
@@ -59,7 +59,7 @@ export async function getStudentSubmissions(req, res) {
     const formattedSubmissions = submissions.map(sub => ({
       id: sub.id,
       studentId: sub.user_id,
-      title: `Submission ${sub.id.slice(0, 8)}`, // Generate a title from submission ID
+      title: `Submission ${sub.id.slice(0, 8)}`, 
       code: sub.code_text,
       is_valid: sub.is_valid,
       errors: sub.errors.map(e => ({
@@ -86,12 +86,12 @@ export async function getStudentSubmissions(req, res) {
 
 export async function getAllSubmissions(req, res) {
   try {
-    // Get all submissions with user information
+    
     const submissions = await CodeSubmission.find({})
       .sort({ submitted_at: -1 })
       .lean();
 
-    // Get user information for each submission
+    
     const submissionsWithUsers = await Promise.all(
       submissions.map(async (submission) => {
         const user = await User.findOne({ id: submission.user_id })

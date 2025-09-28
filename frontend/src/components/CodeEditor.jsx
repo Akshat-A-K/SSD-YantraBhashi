@@ -86,7 +86,7 @@ export default function CodeEditor({
   const handleEditorDidMount = useCallback((editor, monaco) => {
     editorRef.current = editor;
     
-    // Register custom language
+    
     monaco.languages.register({ id: 'custom' });
     monaco.languages.setMonarchTokensProvider('custom', {
       tokenizer: {
@@ -104,7 +104,7 @@ export default function CodeEditor({
     });
   }, []);
 
-  // Add markers for validation errors
+  
   useEffect(() => {
     if (editorRef.current) {
       try {
@@ -192,19 +192,19 @@ export default function CodeEditor({
     try {
       let result;
       if (typeof onAISuggestion === 'function') {
-        // Call parent handler and use its result if provided
+        
         result = await Promise.resolve(onAISuggestion(code));
-        // If parent didn't return a result, fall back to direct backend call
+        
         if (result === undefined) {
           result = await apiService.aiSuggest(code, { errors: validationErrors });
         }
       } else {
-        // No parent handler: call backend API directly and include current validation errors
+        
         result = await apiService.aiSuggest(code, { errors: validationErrors });
       }
 
       console.log('AI suggestion result:', result);
-      // If AI returned a corrected code, show a preview panel and let the user apply/dismiss
+      
       if (result && (result.correctedCode || result.corrected)) {
         const normalized = { correctedCode: result.correctedCode || result.corrected, notes: result.notes || result.notes };
         setAiSuggestion(normalized);
@@ -222,7 +222,7 @@ export default function CodeEditor({
   const handleApplySuggestion = useCallback((apply) => {
     if (!aiSuggestion) return;
     if (apply) {
-      // If parent provided a handler for applying, call it, otherwise update code directly
+      
       if (typeof onApplyCorrection === 'function') {
         try { onApplyCorrection(true); } catch (e) { /* ignore */ }
       } else {
