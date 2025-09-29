@@ -6,6 +6,8 @@ Contents
 - backend/: Node.js/Express API server (AI correction service, authentication, submission handling)
 - frontend/: React single-page application (Monaco editor, instructor dashboard, AI suggestion UI)
 
+Github: https://github.com/Akshat-A-K/SSD-YantraBhashi
+
 ## Instructions to Run locally
 
 * MongoDB should be running in local at the URI specified in backend/.env
